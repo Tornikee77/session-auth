@@ -1,0 +1,12 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { IS_DEV_ENV } from './libs/utils/is-dev.util';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      ignoreEnvFile: !IS_DEV_ENV,
+    }),
+  ],
+})
+export class AppModule {}
