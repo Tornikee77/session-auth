@@ -9,6 +9,7 @@ import { PrismaModule } from './prisma/prisma.module';
   imports: [
     ConfigModule.forRoot({
       ignoreEnvFile: !IS_DEV_ENV,
+      isGlobal: true,
     }),
     UserModule,
     AuthModule,
