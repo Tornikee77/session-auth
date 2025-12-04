@@ -12,12 +12,14 @@ import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { Recaptcha } from '@nestlab/google-recaptcha';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   // localhost:4000/auth/register
+  @Recaptcha()
   @Post('register')
   @HttpCode(HttpStatus.OK)
   public async register(@Req() req: Request, @Body() dto: RegisterDto) {
@@ -25,6 +27,7 @@ export class AuthController {
   }
 
   // localhost:4000/auth/login
+  @Recaptcha()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   public async login(@Req() req: Request, @Body() dto: LoginDto) {

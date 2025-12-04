@@ -1,10 +1,22 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
+
+import { getRecaptchaConfig } from '@/config/recaptcha.config';
 import { UserModule } from '@/user/user.module';
 
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+
 @Module({
-  imports: [UserModule],
+  imports: [
+    UserModule,
+    GoogleRecaptchaModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: getRecaptchaConfig,
+      inject: [ConfigService],
+    }),
+  ],
   controllers: [AuthController],
   providers: [AuthService],
   exports: [AuthService],
