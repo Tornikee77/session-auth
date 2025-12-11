@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthMethod, User } from '@prisma/__generated__';
@@ -15,6 +16,7 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ProviderService } from './provider/provider.service';
 import { PrismaService } from '@/prisma/prisma.service';
+import { EmailConfirmationService } from './email-confirmation/email-confirmation.service';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +25,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly providerService: ProviderService,
     private readonly prismaService: PrismaService,
+    private readonly emailConfirmationService: EmailConfirmationService,
   ) {}
 
   // Register
@@ -41,8 +44,8 @@ export class AuthService {
       AuthMethod.CREDENTIALS,
       false,
     );
-
-    return this.saveSession(req, newUser);
+    await this.emailConfirmationService.sendVerificationToken(newUser.email);
+    return { message: ' User registered successfuly ' + newUser.email };
   }
 
   public async extractProfileFromCode(
@@ -105,6 +108,10 @@ export class AuthService {
 
     if (!isValidPassword) {
       throw new NotFoundException('Wrong email or password');
+    }
+    if (!user.isVerified) {
+      await this.emailConfirmationService.sendVerificationToken(user.email);
+      throw new UnauthorizedException('your email is not verified');
     }
 
     return this.saveSession(req, user);

@@ -1,18 +1,19 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
 
 import { getProvidersConfig } from '@/config/providers.config';
 import { getRecaptchaConfig } from '@/config/recaptcha.config';
-import { UserModule } from '@/user/user.module';
+import { MailService } from '@/libs/mail/mail.service';
+import { UserService } from '@/user/user.service';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module';
 import { ProviderModule } from './provider/provider.module';
 
 @Module({
   imports: [
-    UserModule,
     ProviderModule.registerAsync({
       imports: [ConfigModule],
       useFactory: getProvidersConfig,
@@ -23,9 +24,10 @@ import { ProviderModule } from './provider/provider.module';
       useFactory: getRecaptchaConfig,
       inject: [ConfigService],
     }),
+    forwardRef(() => EmailConfirmationModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, UserService, MailService],
   exports: [AuthService],
 })
 export class AuthModule {}
