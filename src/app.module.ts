@@ -4,6 +4,7 @@ import { IS_DEV_ENV } from './libs/utils/is-dev.util';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ProviderModule } from './auth/provider/provider.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PrismaModule } from './prisma/prisma.module';
     UserModule,
     AuthModule,
     PrismaModule,
+    ProviderModule,
   ],
 })
 export class AppModule {}
